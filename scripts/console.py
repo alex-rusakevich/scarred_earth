@@ -145,3 +145,10 @@ class Console:
         :type value: str
         """
         self.print(value + "\n", *args, **kwargs)
+
+    @causes_redraw
+    def clear_screen(self):
+        self.matrix = list(
+            tuple(Cell() for x in range(CONSOLE_WIDTH)) for y in range(CONSOLE_HEIGHT)
+        )
+        self.carriage_pos = (1, 1)

@@ -29,9 +29,13 @@ def run_game():
     console.println(
         """1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Diam ut venenatis tellus in metus. Sit amet luctus venenatis lectus magna. Scelerisque in dictum non consectetur. Lacus luctus accumsan tortor posuere ac ut consequat. Odio pellentesque diam volutpat commodo sed egestas egestas. Porttitor rhoncus dolor purus non enim. Consequat semper viverra nam libero justo laoreet sit amet. Posuere morbi leo urna molestie at. Eu feugiat pretium nibh ipsum consequat nisl. Nulla pellentesque dignissim enim sit amet venenatis urna. Velit dignissim sodales ut eu sem integer. Phasellus faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis."""
     )
+
+    console.clear_screen()
+
     console.println(
         """2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Diam ut venenatis tellus in metus. Sit amet luctus venenatis lectus magna. Scelerisque in dictum non consectetur. Lacus luctus accumsan tortor posuere ac ut consequat. Odio pellentesque diam volutpat commodo sed egestas egestas. Porttitor rhoncus dolor purus non enim. Consequat semper viverra nam libero justo laoreet sit amet. Posuere morbi leo urna molestie at. Eu feugiat pretium nibh ipsum consequat nisl. Nulla pellentesque dignissim enim sit amet venenatis urna. Velit dignissim sodales ut eu sem integer. Phasellus faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis."""
     )
+
     console.println(
         """3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Diam ut venenatis tellus in metus. Sit amet luctus venenatis lectus magna. Scelerisque in dictum non consectetur. Lacus luctus accumsan tortor posuere ac ut consequat. Odio pellentesque diam volutpat commodo sed egestas egestas. Porttitor rhoncus dolor purus non enim. Consequat semper viverra nam libero justo laoreet sit amet. Posuere morbi leo urna molestie at. Eu feugiat pretium nibh ipsum consequat nisl. Nulla pellentesque dignissim enim sit amet venenatis urna. Velit dignissim sodales ut eu sem integer. Phasellus faucibus scelerisque eleifend donec pretium vulputate sapien nec sagittis."""
     )
