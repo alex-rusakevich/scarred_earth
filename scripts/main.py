@@ -26,6 +26,8 @@ def run_game():
     pygame.display.update()
 
     console = Console()
+    console.print("Hello, World!\n" * 12, carriage_pos=(1, 1))
+
     game_over = False
 
     while not game_over:
