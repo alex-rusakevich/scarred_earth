@@ -1,9 +1,12 @@
+import logging
 from typing import List
 
 from pygame import Surface
 
 from scripts.font import *
 from scripts.settings import ColorPalette
+
+logger = logging.getLogger(__name__)
 
 
 class Cell:
@@ -17,7 +20,7 @@ class Cell:
         self.fg = fg
 
     def render(self) -> Surface:
-        return DEFAULT_FONT.render(self.value, True, self.fg, self.bg)
+        return DEFAULT_FONT.render(self.value, FONT_ANTIALIASING, self.fg, self.bg)
 
 
 class Console:
@@ -26,8 +29,8 @@ class Console:
     redraw_pending = True
 
     def __init__(self) -> None:
-        self.matrix = tuple(
-            tuple(Cell() for _ in range(CONSOLE_WIDTH)) for _ in range(CONSOLE_HEIGHT)
+        self.matrix = list(
+            tuple(Cell() for x in range(CONSOLE_WIDTH)) for y in range(CONSOLE_HEIGHT)
         )
 
     def render(self) -> Surface:
@@ -70,6 +73,12 @@ class Console:
 
         return wrapped
 
+    @causes_redraw
+    def shift_matrix_up(self):
+        self.matrix.pop(0)
+        self.matrix.append(tuple(Cell() for _ in range(CONSOLE_WIDTH)))
+
+    @causes_redraw
     def set_pos(self, x, y):
         self.carriage_pos = x, y
 
@@ -79,7 +88,7 @@ class Console:
         value: str,
         bg=ColorPalette.BLACK,
         fg=ColorPalette.WHITE,
-        carriage_pos: tuple = carriage_pos,
+        carriage_pos: tuple = None,
     ):
         """Print text to console
 
@@ -89,34 +98,44 @@ class Console:
         :type bg: str, optional
         :param fg: foreground text color, defaults to ColorPalette.WHITE
         :type fg: str, optional
-        :param carriage_pos: text position in console, `(x, y)`, both start with 1, defaults to carriage_pos
+        :param carriage_pos: text position in console, `(x, y)`, both start with 1, defaults to self.carriage_pos
         :type carriage_pos: tuple, optional
         """
+
+        if not carriage_pos:
+            carriage_pos = self.carriage_pos
+
         cx, cy = carriage_pos
         cx -= 1
         cy -= 1
 
         for ch in value:
-            if (
-                cx >= CONSOLE_HEIGHT
-            ):  # If text moves to the row out the screen, the rest will be cropped
-                break
+            # logger.debug(f"setting character at X:{cx}, Y:{cy}")
 
-            if ch == "\n":  # Move to new line if the new line character appeared
-                cy = 0
-                cx += 1
+            if ch == "\n":  # Move to next line if next line character encountered
+                cy += 1
+                cx = 0
                 continue
 
-            cell = self.matrix[cx][cy]
+            # region Set cell
+            cell = self.matrix[cy][cx]
             cell.value = ch
             cell.bg = bg
             cell.fg = fg
+            # endregion
 
-            if cy + 1 == CONSOLE_WIDTH:  # Move to new line if gets out the row
-                cy = 0
-                cx += 1
-            else:
+            if (
+                cy + 1 == CONSOLE_HEIGHT and cx + 1 == CONSOLE_WIDTH
+            ):  # Last character of last row
+                self.shift_matrix_up()
+                cx = 0
+            elif cx + 1 == CONSOLE_WIDTH:  # Last cell in row
+                cx = 0
                 cy += 1
+            else:  # Cell inside row
+                cx += 1
+
+        self.carriage_pos = (cx + 1, cy + 1)
 
     @causes_redraw
     def println(self, value: str, *args, **kwargs):

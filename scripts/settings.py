@@ -32,3 +32,4 @@ class ColorPalette:
 
 
 FONT_NAME = "Nouveau_IBM.ttf"
+FONT_ANTIALIASING = True
