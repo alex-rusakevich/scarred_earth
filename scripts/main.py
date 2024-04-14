@@ -14,7 +14,10 @@ logger = getLogger(__name__)
 def run_game():
     pygame.init()
 
-    screen_width, screen_height = (80 * CHAR_WIDTH, 25 * CHAR_HEIGHT)
+    screen_width, screen_height = (
+        CONSOLE_WIDTH * CHAR_WIDTH,
+        CONSOLE_HEIGHT * CHAR_HEIGHT,
+    )
     logger.info(f"Screen size: {screen_width}x{screen_height}")
 
     pygame.display.set_mode((screen_width, screen_height))

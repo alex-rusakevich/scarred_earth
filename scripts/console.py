@@ -3,6 +3,7 @@ from typing import List
 from pygame import Surface
 
 from scripts.font import *
+from scripts.settings import ColorPalette
 
 
 class Cell:
@@ -10,7 +11,7 @@ class Cell:
     bg: str = ""
     fg: str = ""
 
-    def __init__(self, value=" ", bg="#000000", fg="#ffffff") -> None:
+    def __init__(self, value="@", bg=ColorPalette.BLACK, fg=ColorPalette.WHITE) -> None:
         self.value = value
         self.bg = bg
         self.fg = fg
@@ -20,13 +21,14 @@ class Cell:
 
 
 class Console:
-    WIDTH, HEIGHT = 80, 25
     carriage_pos = 1, 1
     matrix: List[List[Cell]]
     redraw_pending = True
 
     def __init__(self) -> None:
-        self.matrix = ((Cell() for _ in range(self.WIDTH)) for _ in range(self.HEIGHT))
+        self.matrix = (
+            (Cell() for _ in range(CONSOLE_WIDTH)) for _ in range(CONSOLE_HEIGHT)
+        )
 
     def render(self) -> Surface:
         """Prepare surface for drawing
@@ -39,7 +41,8 @@ class Console:
         for row_number, row in enumerate(self.matrix):
             for cell_number, cell in enumerate(row):
                 surface.blit(
-                    cell.render(), (cell_number * CHAR_WIDTH, row_number * CHAR_HEIGHT)
+                    cell.render(),
+                    (cell_number * CHAR_WIDTH, row_number * CHAR_HEIGHT),
                 )
 
         return surface
@@ -69,3 +72,5 @@ class Console:
 
     def set_pos(self, x, y):
         self.carriage_pos = x, y
+
+    # def print(text: str, )
