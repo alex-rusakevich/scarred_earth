@@ -32,7 +32,7 @@ def run_game():
 
     console.clear_screen()
 
-    console.print("@" * 80 * 25)
+    console.set_cell(60, 20, "@")
 
     game_over = False
 

@@ -206,3 +206,36 @@ class Console:
             tuple(Cell() for x in range(CONSOLE_WIDTH)) for y in range(CONSOLE_HEIGHT)
         )
         self.carriage_pos = (1, 1)
+
+    @causes_redraw
+    def set_cell(
+        self, x: int, y: int, value: str = None, bg: str = None, fg: str = None
+    ):
+        """Set cell value without moving carriage
+
+        :param x: matrix x coordinate
+        :type x: int
+        :param y: matrix y coord
+        :type y: int
+        :param value: text value, defaults to None
+        :type value: str, optional
+        :param bg: background color, defaults to None
+        :type bg: str, optional
+        :param fg: foregound color, defaults to None
+        :type fg: str, optional
+        """
+        cell = self.matrix[y - 1][x - 1]
+
+        if len(value) > 1:
+            raise Exception("value length cannot be more than 1")
+
+        if value:
+            cell.value = value
+
+        if bg:
+            cell.bg = bg
+
+        if fg:
+            cell.fg = fg
+
+        self.draw_queue.append((x, y))
