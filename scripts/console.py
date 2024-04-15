@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Literal
 
 from pygame import Surface
 
@@ -29,9 +29,16 @@ class Console:
 
     carriage_pos = 1, 1
     matrix: List[List[Cell]]
+
     redraw_pending = True
+    draw_queue = []  # x, y: (1, 1), (1, 2)
+    # If not empty, redraw only cells specified, redraw all otherwise
+    surface = None  # Last rendered surface
 
     carriage_marker_shown = True  # True to draw '_'
+    carriage_marker_enabled = (
+        True  # Enable carriage marker, ignore carriage_marker_shown
+    )
     carriage_marker_freq = 500  # ms
 
     def __init__(self) -> None:
@@ -48,23 +55,44 @@ class Console:
         :return: surface ready to blit
         :rtype: Surface
         """
-        surface = Surface((80 * CHAR_WIDTH, 25 * CHAR_HEIGHT))
+        if self.surface == None:
+            self.surface = Surface((80 * CHAR_WIDTH, 25 * CHAR_HEIGHT))
 
         cx, cy = self.carriage_pos
 
-        if self.carriage_marker_shown:
-            self.matrix[cy - 1][cx - 1].value = "_"
-        else:
-            self.matrix[cy - 1][cx - 1].value = " "
+        # region Set carriage marker cell
+        if self.carriage_marker_enabled:
+            if self.carriage_marker_shown:
+                self.matrix[cy - 1][cx - 1].value = "_"
+            else:
+                self.matrix[cy - 1][cx - 1].value = " "
+        # endregion
 
-        for row_number, row in enumerate(self.matrix):
-            for cell_number, cell in enumerate(row):
-                surface.blit(
+        if self.draw_queue == []:
+            for row_number, row in enumerate(self.matrix):
+                for cell_number, cell in enumerate(row):
+                    self.surface.blit(
+                        cell.render(),
+                        (cell_number * CHAR_WIDTH, row_number * CHAR_HEIGHT),
+                    )
+        else:
+            # logger.debug(
+            #     f"Redrawing particular cells only, those are: {self.draw_queue}"
+            # )
+
+            for cell_number, row_number in self.draw_queue:
+                cell_number -= 1
+                row_number -= 1
+                cell = self.matrix[row_number][cell_number]
+
+                self.surface.blit(
                     cell.render(),
                     (cell_number * CHAR_WIDTH, row_number * CHAR_HEIGHT),
                 )
 
-        return surface
+            self.draw_queue = []
+
+        return self.surface
 
     def draw(self) -> None:
         """if redraw_pending is set, then render a console surface and apply to screen, skip drawing otherwise
@@ -76,9 +104,14 @@ class Console:
             pygame.display.get_surface().blit(self.render(), (0, 0))
 
     def update(self, event):
-        if event.type == Console.Event.TOGGLE_CARRIAGE_MARKER:
+        if (
+            event.type == Console.Event.TOGGLE_CARRIAGE_MARKER
+            and self.carriage_marker_enabled
+        ):
             self.carriage_marker_shown = not self.carriage_marker_shown
+
             self.redraw_pending = True
+            self.draw_queue.append(self.carriage_pos)
 
     def causes_redraw(fn):
         """Wrapper for functions which lead to console redraw
