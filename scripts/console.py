@@ -24,13 +24,22 @@ class Cell:
 
 
 class Console:
+    class Event:
+        TOGGLE_CARRIAGE_MARKER = pygame.USEREVENT + 1
+
     carriage_pos = 1, 1
     matrix: List[List[Cell]]
     redraw_pending = True
 
+    carriage_marker_shown = True  # True to draw '_'
+    carriage_marker_freq = 500  # ms
+
     def __init__(self) -> None:
         self.matrix = list(
             tuple(Cell() for x in range(CONSOLE_WIDTH)) for y in range(CONSOLE_HEIGHT)
+        )
+        pygame.time.set_timer(
+            Console.Event.TOGGLE_CARRIAGE_MARKER, self.carriage_marker_freq
         )
 
     def render(self) -> Surface:
@@ -40,6 +49,13 @@ class Console:
         :rtype: Surface
         """
         surface = Surface((80 * CHAR_WIDTH, 25 * CHAR_HEIGHT))
+
+        cx, cy = self.carriage_pos
+
+        if self.carriage_marker_shown:
+            self.matrix[cy - 1][cx - 1].value = "_"
+        else:
+            self.matrix[cy - 1][cx - 1].value = " "
 
         for row_number, row in enumerate(self.matrix):
             for cell_number, cell in enumerate(row):
@@ -58,6 +74,11 @@ class Console:
         if self.redraw_pending:
             self.redraw_pending = False
             pygame.display.get_surface().blit(self.render(), (0, 0))
+
+    def update(self, event):
+        if event.type == Console.Event.TOGGLE_CARRIAGE_MARKER:
+            self.carriage_marker_shown = not self.carriage_marker_shown
+            self.redraw_pending = True
 
     def causes_redraw(fn):
         """Wrapper for functions which lead to console redraw
